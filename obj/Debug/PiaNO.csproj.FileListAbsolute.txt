@@ -1,0 +1,11 @@
+C:\Users\husbanpm\documents\visual studio 2013\Projects\PC3Composer\PiaNO\bin\Debug\PiaNO.dll
+C:\Users\husbanpm\documents\visual studio 2013\Projects\PC3Composer\PiaNO\bin\Debug\PiaNO.pdb
+C:\Users\husbanpm\documents\visual studio 2013\Projects\PC3Composer\PiaNO\bin\Debug\ICSharpCode.SharpZipLib.dll
+C:\Users\husbanpm\documents\visual studio 2013\Projects\PC3Composer\PiaNO\obj\Debug\PiaNO.dll
+C:\Users\husbanpm\documents\visual studio 2013\Projects\PC3Composer\PiaNO\obj\Debug\PiaNO.pdb
+C:\Users\husbanpm\documents\visual studio 2013\Projects\PC3Composer\PiaNO\obj\Debug\PiaNO.csprojResolveAssemblyReference.cache
+C:\Users\husbanpm\Documents\Visual Studio 2013\Projects\PiaNO\PiaNO\bin\Debug\PiaNO.dll
+C:\Users\husbanpm\Documents\Visual Studio 2013\Projects\PiaNO\PiaNO\bin\Debug\PiaNO.pdb
+C:\Users\husbanpm\Documents\Visual Studio 2013\Projects\PiaNO\PiaNO\obj\Debug\PiaNO.csprojResolveAssemblyReference.cache
+C:\Users\husbanpm\Documents\Visual Studio 2013\Projects\PiaNO\PiaNO\obj\Debug\PiaNO.dll
+C:\Users\husbanpm\Documents\Visual Studio 2013\Projects\PiaNO\PiaNO\obj\Debug\PiaNO.pdb
