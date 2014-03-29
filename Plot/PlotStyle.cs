@@ -5,11 +5,8 @@ using System.IO;
 
 namespace PiaNO.Plot
 {
-    public class PlotStyle: IEquatable<PlotStyle>
+    public class PlotStyle: PiaNode, IEquatable<PlotStyle>
     {
-        private string _rawData;
-
-        public string Name { get; set; }
         public string LocalizedName { get; set; }
         public string Description { get; set; }
         public Color? Color { get; set; }
@@ -55,19 +52,7 @@ namespace PiaNO.Plot
             JoinStyle = JoinStyle.FromObject;
         }
         internal PlotStyle(string rawData)
-        {
-            _rawData = rawData;
-            Deserialize();
-        }
-
-        protected virtual Stream Serialize()
-        {
-            throw new NotImplementedException();
-        }
-        protected virtual void Deserialize()
-        {
-            PiaSerializer.Deserialize(this, _rawData);
-        }
+            : base(rawData) { }
 
         public bool Equals(PlotStyle other)
         {

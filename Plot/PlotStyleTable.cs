@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PiaNO.Plot
 {
@@ -30,6 +31,14 @@ namespace PiaNO.Plot
         }
 
         #region IList
+
+        protected override void Deserialize()
+        {
+            base.Deserialize();
+            foreach (var node in ChildNodes)
+                InnerStyles.Add((PlotStyle)node);
+        }
+
 
         public virtual void Add(PlotStyle item)
         {
@@ -114,5 +123,6 @@ namespace PiaNO.Plot
         }
 
         #endregion
+
     }
 }

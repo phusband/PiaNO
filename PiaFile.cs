@@ -1,27 +1,16 @@
-﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+﻿
 using System;
 using System.IO;
+using PiaNO.Compression.Streams;
 using PiaNO.Serialization;
 
 namespace PiaNO
 {
-    public abstract class PiaFile
+    public abstract class PiaFile : PiaNode
     {
         protected  string _rawData;
         public PiaHeader Header { get; private set; }
-
-        //protected abstract string _serialize();
-        //protected abstract void _deserialize();
-
-        protected virtual void Deserialize()
-        {
-            PiaSerializer.Deserialize(this, _rawData);
-        }
-        protected virtual Stream Serialize()
-        {
-            throw new NotImplementedException();
-        }
-
+           
         public void Read(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
@@ -53,7 +42,7 @@ namespace PiaNO
                 using (var zStream = new InflaterInputStream(stream))
                 {
                     var sr = new StreamReader(zStream);
-                    _rawData = sr.ReadToEnd();
+                    InnerData = sr.ReadToEnd();
                 }
 
                 Deserialize();

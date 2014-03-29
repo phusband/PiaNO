@@ -9,3 +9,8 @@ C:\Users\husbanpm\Documents\Visual Studio 2013\Projects\PiaNO\PiaNO\bin\Debug\Pi
 C:\Users\husbanpm\Documents\Visual Studio 2013\Projects\PiaNO\PiaNO\obj\Debug\PiaNO.csprojResolveAssemblyReference.cache
 C:\Users\husbanpm\Documents\Visual Studio 2013\Projects\PiaNO\PiaNO\obj\Debug\PiaNO.dll
 C:\Users\husbanpm\Documents\Visual Studio 2013\Projects\PiaNO\PiaNO\obj\Debug\PiaNO.pdb
+C:\Users\Locke\Documents\GitHub\PiaNo\bin\Debug\PiaNO.dll
+C:\Users\Locke\Documents\GitHub\PiaNo\bin\Debug\PiaNO.pdb
+C:\Users\Locke\Documents\GitHub\PiaNo\obj\Debug\PiaNO.csprojResolveAssemblyReference.cache
+C:\Users\Locke\Documents\GitHub\PiaNo\obj\Debug\PiaNO.dll
+C:\Users\Locke\Documents\GitHub\PiaNo\obj\Debug\PiaNO.pdb

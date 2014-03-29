@@ -1,125 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Xml.Serialization;
-using PiaNO.Plot;
-using System.Runtime.Serialization;
 
 namespace PiaNO.Serialization
 {
     public static class PiaSerializer
     {
-        public static Stream Serialize(object o)
+        public static void Deserialize(PiaNode node)
         {
-            return null;
-        }
+            if (node == null)
+                throw new ArgumentNullException("Node");
 
-        public static void Test(object sender, string rawData)
-        {
-            var siri = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-            //siri.Deserialize()
-        }
+            if (String.IsNullOrEmpty(node.InnerData))
+                throw new ArgumentNullException("InnerData");
 
-        public static void Deserialize(object sender, string rawData)
-        {
-            if (String.IsNullOrEmpty(rawData))
-                throw new ArgumentNullException();
+            var dataLines = node.InnerData.Split(new char[]{ '\n'},
+                                            StringSplitOptions.RemoveEmptyEntries);
 
-            var lines = rawData.Split(new char [] {'{', '}'}, StringSplitOptions.RemoveEmptyEntries);
-            if (lines.Length == 0)
-                throw new ArgumentOutOfRangeException();
-            
-            if (sender is PlotStyleTable)
+            for (int i = 0; i < dataLines.Length; i++)
             {
-                var currentLine = lines[0];
-                var dict = _getDataStrings(currentLine);
-                var psTable = (PlotStyleTable)sender;
-
-                psTable.Description = dict["description"];
-                psTable.ScaleFactor = double.Parse(dict["scale_factor"]);
-                psTable.ApplyFactor = bool.Parse(dict["apply_factor"]);
-                psTable.CustomLineweightDisplayUnits = int.Parse(dict["custom_lineweight_display_units"]);
-
-                int i = 0, n = 0;
-                var styles = psTable.GetEnumerator();
-                while(!currentLine.Contains("custom_lineweight_table"))
+                var curLine = dataLines[i];
+                if (curLine.Contains('='))
                 {
-                    currentLine = lines[i++];
-                    if (!currentLine.Contains("name="))
-                        continue;
-
-                    if (sender is ColorDependentPlotStyleTable)
-                        psTable[n++] = new PlotStyle(currentLine);
-                    else
-                        psTable.Add(new PlotStyle(currentLine));
+                    var value = _getValue(curLine);
+                    node.Values.Add(value.Key, value.Value);
                 }
+                else if (curLine.Contains('{'))
+                {
+                    var bracketCount = 1;
+                    var nodeBuilder = new StringBuilder();
+                    var n = i + 1;
+                    var subLine = string.Empty;
 
-                currentLine = lines[i++];
-                psTable.Lineweights = _getLineWeights(currentLine);
-            }
-            else if (sender is PlotStyle)
-            {
-                var currentLine = lines[0];
-                var dict = _getDataStrings(currentLine);
-                var pStyle = (PlotStyle)sender;
+                    while (bracketCount != 0) // Iterate until the node is closed
+                    {
+                        subLine = dataLines[n++];
+                        bracketCount += subLine.Contains('{')
+                            ? 1 : subLine.Contains('}')
+                            ? -1 : 0;
 
-                pStyle.Name = dict["name"];
-                pStyle.LocalizedName = dict["localized_name"];
-                pStyle.Description = dict["description"];
-                pStyle.Color = _getColor(dict["color"]);
-                pStyle.ModeColor = dict.ContainsKey("mode_color")
-                    ? _getColor(dict["mode_color"])
-                    : null;
-                pStyle.ColorPolicy = short.Parse(dict["color_policy"]);
-                pStyle.PhysicalPenNumber = short.Parse(dict["physical_pen_number"]);
-                pStyle.VirtualPenNumber = short.Parse(dict["virtual_pen_number"]);
-                pStyle.Screen = short.Parse(dict["screen"]);
-                pStyle.LinePatternSize = double.Parse(dict["linepattern_size"]);
-                pStyle.Linetype = short.Parse(dict["linetype"]);
-                pStyle.AdaptiveLinetype = bool.Parse(dict["adaptive_linetype"]);
-                pStyle.LineWeight = short.Parse(dict["lineweight"]);
-                pStyle.FillStyle = (FillStyle)Enum.Parse(typeof(FillStyle), dict["fill_style"]);
-                pStyle.EndStyle = (EndStyle)Enum.Parse(typeof(EndStyle), dict["end_style"]);
-                pStyle.JoinStyle = (JoinStyle)Enum.Parse(typeof(JoinStyle), dict["join_style"]);
+                        if (bracketCount != 0) // Skip the closing bracket
+                            nodeBuilder.AppendLine(subLine);
+                    }
+
+                    var childNode = new PiaNode(nodeBuilder.ToString())
+                    { 
+                        Name = curLine.TrimEnd('{'),
+                        Parent = node
+                    };
+                    node.ChildNodes.Add(childNode);
+                    i = n - 1;
+                }
             }
         }
-
-        private static string _getValue(string input)
+        public static Stream Serialize(PiaNode node)
         {
-            var args = input.Trim().Split('=');
-            if (args.Length != 2)
-                throw new ArgumentOutOfRangeException();
-
-            return args[1].TrimStart('\"');
+            throw new NotImplementedException();
         }
 
-        private static Dictionary<string, string> _getDataStrings(string input)
+        public static KeyValuePair<string, object> _getValue(string valueString)
         {
-            return input.Trim(' ', '\n').Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                                       .Select(prop => prop.Split('='))
-                                       .ToDictionary(val => val[0].Trim(), val => val.Length == 2
-                                           ? val[1].TrimStart('\"')
-                                           : null);
+            var prop = valueString.TrimEnd(new char[] {'\n', '\r'}).Split('=');
+            return new KeyValuePair<string,object>(prop[0].Trim(), prop[1].TrimStart('\"'));
         }
-
-        private static List<double> _getLineWeights(string input)
-        {
-            return input.Trim(' ', '\n').Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                                        .Select(prop => double.Parse(prop.Split('=')[1]))
-                                        .ToList();
-        }
-
-        private static Color? _getColor(string input)
-        {
-            var colorVal = int.Parse(input);
-            if (colorVal == -1)
-                return null;
-
-            return Color.FromArgb(colorVal);
-        }
-
     }
 }
