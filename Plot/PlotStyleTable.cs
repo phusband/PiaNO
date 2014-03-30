@@ -4,122 +4,116 @@ using System.Linq;
 
 namespace PiaNO.Plot
 {
-    public class PlotStyleTable : PiaFile, IList<PlotStyle>
+    public class PlotStyleTable : PiaFile
     {
-        protected IList<PlotStyle> InnerStyles;
-        public IList<Double> Lineweights { get; set; }
+        #region Properties
 
-        public string Description { get; set; }
-        public bool AciTableAvailable { get; set; }
-        public double ScaleFactor { get; set; }
-        public bool ApplyFactor { get; set; }
-        public double CustomLineweightDisplayUnits { get; set; }
-
-        public PlotStyleTable()
+        public IList<PlotStyle> PlotStyles
         {
-            InnerStyles = new List<PlotStyle>();
-            Lineweights = new List<Double>();
+            get { return _getPlotStyles(); }
+            set { _setStyles(value); }
+        }
+        public IDictionary<int, double> Lineweights
+        {
+            get { return _getLineWeights(); }
+        }
+
+        public string Description
+        {
+            get { return Values["description"]; }
+            set { Values["description"] = value; }
+        }
+
+        public bool AciTableAvailable
+        {
+            get { return bool.Parse(Values["aci_table_available"]); }
+            set
+            {
+                Values["aci_table_available"] = value
+                ? "TRUE"
+                : "FALSE";
+            }
+        }
+
+        public double ScaleFactor
+        {
+            get { return double.Parse(Values["scale_factor"]); }
+            set { Values["scale_factor"] = value.ToString(); }
+        }
+
+        public bool ApplyFactor
+        {
+            get { return bool.Parse(Values["apply_factor"]); }
+            set
+            {
+                Values["apply_factor"] = value
+                ? "TRUE"
+                : "FALSE";
+            }
+        }
+
+        public double CustomLineweightDisplayUnits
+        {
+            get { return double.Parse(Values["custom_lineweight_display_units"]); }
+            set { Values["custom_lineweight_display_units"] = value.ToString(); }
+        }
+
+        #endregion
+
+        #region Constructors
+
+        public PlotStyleTable() : base()
+        {
+            PlotStyles = new List<PlotStyle>();
+            //Lineweights = new Dictionary<int, double>();
 
             AciTableAvailable = false;
             ScaleFactor = 1.0;
             ApplyFactor = false;
             CustomLineweightDisplayUnits = 1;
         }
-        protected PlotStyleTable(string rawData)
+        protected PlotStyleTable(string innerData) : base(innerData)
         {
-            _rawData = rawData;
+            PlotStyles = new List<PlotStyle>();
+            //Lineweights = new Dictionary<int, double>();
         }
 
-        #region IList
+        #endregion
 
-        protected override void Deserialize()
+        #region Methods
+
+        protected virtual List<PlotStyle> _getPlotStyles()
         {
-            base.Deserialize();
-            foreach (var node in ChildNodes)
-                InnerStyles.Add((PlotStyle)node);
+            if (!HasChildNodes)
+                return null;
+
+            var styleNode = this["plot_style"];
+            if (styleNode == null || !styleNode.HasChildNodes)
+                return null;
+
+            var styles = styleNode.ChildNodes;
+            return styles.Select(s => new PlotStyle(s)).ToList();
+        }
+        protected Dictionary<int, double> _getLineWeights()
+        {
+            if (!HasChildNodes)
+                return null;
+
+            var weightNode = this["custom_lineweight_table"];
+            if (weightNode == null)
+                return null;
+
+            var weights = weightNode.Values;
+            return weights.ToDictionary(w => int.Parse(w.Key), w => double.Parse(w.Value));
         }
 
-
-        public virtual void Add(PlotStyle item)
+        private void _setStyles(IList<PlotStyle> value)
         {
-            if (item == null)
-                throw new NullReferenceException();
+            var styleNode = this["plot_style"];
+            if (styleNode == null)
+                return;
 
-            if (this.Contains(item))
-                throw new ArgumentException(string.Format("Plot style '{0}' already exists.", item.Name));
-
-            InnerStyles.Add(item);
-        }
-
-        public virtual void Clear()
-        {
-            InnerStyles.Clear();
-        }
-
-        public bool Contains(PlotStyle item)
-        {
-            return InnerStyles.Contains(item);
-        }
-
-        public void CopyTo(PlotStyle[] array, int arrayIndex)
-        {
-            InnerStyles.CopyTo(array, arrayIndex);
-        }
-
-        public int Count
-        {
-            get { return InnerStyles.Count; }
-        }
-
-        public IEnumerator<PlotStyle> GetEnumerator()
-        {
-            return InnerStyles.GetEnumerator();
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public int IndexOf(PlotStyle item)
-        {
-            return InnerStyles.IndexOf(item);
-        }
-
-        public virtual void Insert(int index, PlotStyle item)
-        {
-            InnerStyles.Insert(index, item);
-        }
-
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
-
-        public virtual bool Remove(PlotStyle item)
-        {
-            if (!this.Contains(item))
-                throw new ArgumentException(string.Format("Plot style '{0}' not found."), item.Name);
-
-            return InnerStyles.Remove(item);
-        }
-
-        public virtual void RemoveAt(int index)
-        {
-            InnerStyles.RemoveAt(index);
-        }
-
-        public PlotStyle this[int index]
-        {
-            get
-            {
-                return InnerStyles[index];
-            }
-            set
-            {
-                if (value != null)
-                    InnerStyles[index] = value;
-            }
+            styleNode.ChildNodes = (List<PiaNode>)value;
         }
 
         #endregion

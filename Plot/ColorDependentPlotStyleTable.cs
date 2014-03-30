@@ -1,51 +1,68 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace PiaNO.Plot
 {
     public class ColorDependentPlotStyleTable : PlotStyleTable
     {
-        public IList<string> AciTable { get; private set; }
+        #region Properties
 
-        public ColorDependentPlotStyleTable()
-            : base()
+        public IDictionary<string, string> AciTable
         {
-            AciTable = new string[256];
-            for (int i = 0; i < AciTable.Count;)
-                AciTable[i] = "Color " + ++i;
-
-            _rebuildStyles();
+            get { return _getAciTable(); }
         }
 
-        protected ColorDependentPlotStyleTable(string rawData)
-            :base(rawData)
+        #endregion
+
+        #region Constructors
+
+        public ColorDependentPlotStyleTable() : base()
+        {
+        }
+        protected ColorDependentPlotStyleTable(string rawData) :base(rawData)
         {
 
         }
 
-        private void _rebuildStyles()
+        #endregion
+
+        #region Methods
+
+        protected override List<PlotStyle> _getPlotStyles()
         {
-            foreach (var name in AciTable)
-            {
-                var newStyle = new PlotStyle { Name = name };
-                InnerStyles.Add(newStyle);
-            }
+            var styles = new List<PlotStyle>();
+            foreach (var kvp in AciTable)
+                styles.Add(new PlotStyle
+                { 
+                    NodeName = kvp.Key,
+                    Name = kvp.Value
+                });
+            return styles;
+        }
+        private IDictionary<string, string> _getAciTable()
+        {
+            if (!HasChildNodes)
+                return null;
+
+            var aciNode = this["aci_table"];
+            if (aciNode == null)
+                return null;
+
+            return aciNode.Values;
         }
 
-        public override void Add(PlotStyle item) { }
+        public override void Add(PiaNode item) { }
         public override void Clear()
         {
-            InnerStyles.Clear();
-            _rebuildStyles();
+            PlotStyles.Clear();
         }
-        public override void Insert(int index, PlotStyle item) { }
-        public override bool Remove(PlotStyle item)
+        public override void Insert(int index, PiaNode item) { }
+        public override bool Remove(PiaNode item)
         {
             return false;
         }
         public override void RemoveAt(int index) { }
-        
+
+        #endregion
+
     }
 }

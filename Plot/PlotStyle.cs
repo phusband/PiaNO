@@ -5,39 +5,126 @@ using System.IO;
 
 namespace PiaNO.Plot
 {
-    public class PlotStyle: PiaNode, IEquatable<PlotStyle>
+    public class PlotStyle: PiaNode
     {
-        public string LocalizedName { get; set; }
-        public string Description { get; set; }
-        public Color? Color { get; set; }
-        public Color? ModeColor { get; set; }
-        public short ColorPolicy { get; set; }
+        public string Name
+        {
+            get { return Values["name"]; }
+            set { Values["name"] = value; }
+        }
+        public string LocalizedName
+        {
+            get { return Values["localized_name"]; }
+            set { Values["localized_name"] = value; }
+        }
+        public string Description
+        {
+            get { return Values["description"]; }
+            set { Values["description"] = value; }
+        }
+        public Color? Color
+        {
+            get
+            {
+                if (!Values.ContainsKey("color"))
+                    return null;
+                return _getColor(Values["color"]);
+            }
+            //set
+            //{
+            //    if (!Values.ContainsKey("color"))
+            //        Values.Add("color", value.ToString());
+            //    else
+            //        Values["color"] = value.ToString();
+            //}
+        }
+        public Color? ModeColor
+        {
+            get
+            {
+                if (!Values.ContainsKey("mode_color"))
+                    return null;
+                return _getColor(Values["mode_color"]);
+            }
+            set
+            {
+                if (Values.ContainsKey("mode_color"))
+                    Values["mode_color"] = value.ToString();
+            }
+        }
+        public short ColorPolicy
+        {
+            get { return short.Parse(Values["color_policy"]); }
+            set { Values["color_policy"] = value.ToString(); }
+        }
         public bool EnableDithering
         {
-            get {return ColorPolicy % 2 == 1; }
+            get { return ColorPolicy % 2 == 1; }
             //set;
         }
         public bool ConvertoToGrayscale
         {
             get { return ColorPolicy == 2 || ColorPolicy == 3; }
         }
-        public short PhysicalPenNumber { get; set; }
-        public short VirtualPenNumber { get; set; }
-        public short Screen { get; set; }
-        public double LinePatternSize { get; set; }
-        public short Linetype { get; set; }
-        public bool AdaptiveLinetype { get; set; }
-        public short LineWeight { get; set; }
-        public FillStyle FillStyle { get; set; }
-        public EndStyle EndStyle { get; set; }
-        public JoinStyle JoinStyle { get; set; }
-
-        public PlotStyle()
+        public short PhysicalPenNumber
         {
-            Name = "Style 1";
+            get { return short.Parse(Values["physical_pen_number"]); }
+            set { Values["physical_pen_number"] = value.ToString(); }
+        }
+        public short VirtualPenNumber
+        {
+            get { return short.Parse(Values["virtual_pen_number"]); }
+            set { Values["virtual_pen_number"] = value.ToString(); }
+        }
+        public short Screen
+        {
+            get { return short.Parse(Values["screen"]); }
+            set { Values["screen"] = value.ToString(); }
+        }
+        public double LinePatternSize
+        {
+            get { return double.Parse(Values["linepattern_size"]); }
+            set { Values["linepattern_size"] = value.ToString(); }
+        }
+        public short Linetype
+        {
+            get { return short.Parse(Values["linetype"]); }
+            set { Values["linetype"] = value.ToString(); }
+        }
+        public bool AdaptiveLinetype
+        {
+            get { return bool.Parse(Values["adaptive_linetype"]); }
+            set { Values["adaptive_linetype"] = value.ToString().ToUpper(); }
+        }
+        public short LineWeight
+        {
+            get { return short.Parse(Values["lineweight"]); }
+            set { Values["lineweight"] = value.ToString(); }
+        }
+        public FillStyle FillStyle
+        {
+            get { return (FillStyle)Enum.Parse(typeof(FillStyle), Values["fill_style"]); }
+            set { Values["fill_style"] = ((int)value).ToString(); }
+        }
+        public EndStyle EndStyle
+        {
+            get { return (EndStyle)Enum.Parse(typeof(EndStyle), Values["end_style"]); }
+            set { Values["end_style"] = ((int)value).ToString(); }
+        }
+        public JoinStyle JoinStyle
+        {
+            get { return (JoinStyle)Enum.Parse(typeof(JoinStyle), Values["join_style"]); }
+            set { Values["join_style"] = ((int)value).ToString(); }
+        }
+
+        #region Constructors
+
+        public PlotStyle() : base()
+        {
+            NodeName = "Style 1";
             LocalizedName = string.Empty;
             Description = string.Empty;
-            Color = null;
+            //Color = null;
             ModeColor = null;
             ColorPolicy = 2;
             PhysicalPenNumber = 0;
@@ -51,23 +138,26 @@ namespace PiaNO.Plot
             EndStyle = EndStyle.FromObject;
             JoinStyle = JoinStyle.FromObject;
         }
-        internal PlotStyle(string rawData)
-            : base(rawData) { }
-
-        public bool Equals(PlotStyle other)
+        protected internal PlotStyle(string innerData) : base(innerData) { }
+        internal PlotStyle(PiaNode baseNode)
         {
-            if (this == null && other == null)
-                return true;
-
-            if (this == null || other == null)
-                return false;
-
-            return this.Name.Equals(other.Name, StringComparison.InvariantCultureIgnoreCase);
+            NodeName = baseNode.NodeName;
+            Parent = baseNode.Parent;
+            Owner = baseNode.Owner;
+            Values = baseNode.Values;
+            InnerData = baseNode.InnerData;
         }
+
+        #endregion
+
+        #region Methods
 
         public override string ToString()
         {
-            return Name;
+            return this.Name;
         }
+
+        #endregion
+
     }
 }

@@ -16,7 +16,7 @@ namespace PiaNO.Serialization
             if (String.IsNullOrEmpty(node.InnerData))
                 throw new ArgumentNullException("InnerData");
 
-            var dataLines = node.InnerData.Split(new char[]{ '\n'},
+            var dataLines = node.InnerData.Split(new char[]{'\r', '\n'},
                                             StringSplitOptions.RemoveEmptyEntries);
 
             for (int i = 0; i < dataLines.Length; i++)
@@ -25,7 +25,11 @@ namespace PiaNO.Serialization
                 if (curLine.Contains('='))
                 {
                     var value = _getValue(curLine);
-                    node.Values.Add(value.Key, value.Value);
+
+                    if (!node.Values.ContainsKey(value.Key))
+                        node.Values.Add(value.Key, value.Value);
+                    else
+                        node.Values[value.Key] = value.Value;
                 }
                 else if (curLine.Contains('{'))
                 {
@@ -34,22 +38,23 @@ namespace PiaNO.Serialization
                     var n = i + 1;
                     var subLine = string.Empty;
 
-                    while (bracketCount != 0) // Iterate until the node is closed
+                    while (bracketCount != 0)
                     {
                         subLine = dataLines[n++];
                         bracketCount += subLine.Contains('{')
                             ? 1 : subLine.Contains('}')
                             ? -1 : 0;
 
-                        if (bracketCount != 0) // Skip the closing bracket
+                        if (bracketCount != 0)
                             nodeBuilder.AppendLine(subLine);
                     }
 
                     var childNode = new PiaNode(nodeBuilder.ToString())
-                    { 
-                        Name = curLine.TrimEnd('{'),
+                    {
+                        NodeName = curLine.Trim().TrimEnd('{'),
                         Parent = node
                     };
+
                     node.ChildNodes.Add(childNode);
                     i = n - 1;
                 }
@@ -60,10 +65,10 @@ namespace PiaNO.Serialization
             throw new NotImplementedException();
         }
 
-        public static KeyValuePair<string, object> _getValue(string valueString)
+        public static KeyValuePair<string, string> _getValue(string valueString)
         {
-            var prop = valueString.TrimEnd(new char[] {'\n', '\r'}).Split('=');
-            return new KeyValuePair<string,object>(prop[0].Trim(), prop[1].TrimStart('\"'));
+            var prop = valueString.TrimEnd(new char[] {'\r', '\n'}).Split('=');
+            return new KeyValuePair<string,string>(prop[0].Trim(), prop[1].TrimStart('\"'));
         }
     }
 }

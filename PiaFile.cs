@@ -1,16 +1,26 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 using PiaNO.Compression.Streams;
-using PiaNO.Serialization;
 
 namespace PiaNO
 {
     public abstract class PiaFile : PiaNode
     {
-        protected  string _rawData;
+        #region Properties
+
         public PiaHeader Header { get; private set; }
-           
+
+        #endregion
+
+        #region Constructors
+
+        protected internal PiaFile() : base() { }
+        protected internal PiaFile(string innerData) : base(innerData) { }
+
+        #endregion
+
+        #region Methods
+
         public void Read(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
@@ -66,5 +76,7 @@ namespace PiaNO
         {
 
         }
+
+        #endregion
     }
 }
