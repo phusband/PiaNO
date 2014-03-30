@@ -52,8 +52,12 @@ namespace PiaNO.Serialization
                     var childNode = new PiaNode(nodeBuilder.ToString())
                     {
                         NodeName = curLine.Trim().TrimEnd('{'),
-                        Parent = node
+                        Parent = node,
                     };
+                    if (node is PiaFile)
+                        childNode.Owner = (PiaFile)node;
+                    else
+                        childNode.Owner = node.Owner;
 
                     node.ChildNodes.Add(childNode);
                     i = n - 1;

@@ -64,9 +64,6 @@ namespace PiaNO.Plot
 
         public PlotStyleTable() : base()
         {
-            PlotStyles = new List<PlotStyle>();
-            //Lineweights = new Dictionary<int, double>();
-
             AciTableAvailable = false;
             ScaleFactor = 1.0;
             ApplyFactor = false;
@@ -74,8 +71,6 @@ namespace PiaNO.Plot
         }
         protected PlotStyleTable(string innerData) : base(innerData)
         {
-            PlotStyles = new List<PlotStyle>();
-            //Lineweights = new Dictionary<int, double>();
         }
 
         #endregion

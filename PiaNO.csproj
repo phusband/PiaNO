@@ -62,6 +62,7 @@
     <Compile Include="PiaFile.cs" />
     <Compile Include="PiaHeader.cs" />
     <Compile Include="PiaType.cs" />
+    <Compile Include="Plot\Linetype.cs" />
     <Compile Include="Plot\Media.cs" />
     <Compile Include="Plot\PlotterConfiguration.cs" />
     <Compile Include="Plot\PlotStyle.cs" />

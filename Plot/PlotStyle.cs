@@ -7,6 +7,8 @@ namespace PiaNO.Plot
 {
     public class PlotStyle: PiaNode
     {
+        #region Properties
+
         public string Name
         {
             get { return Values["name"]; }
@@ -86,10 +88,10 @@ namespace PiaNO.Plot
             get { return double.Parse(Values["linepattern_size"]); }
             set { Values["linepattern_size"] = value.ToString(); }
         }
-        public short Linetype
+        public Linetype Linetype
         {
-            get { return short.Parse(Values["linetype"]); }
-            set { Values["linetype"] = value.ToString(); }
+            get { return (Linetype)Enum.Parse(typeof(Linetype), Values["linetype"]); }
+            set { Values["linetype"] = ((int)value).ToString(); }
         }
         public bool AdaptiveLinetype
         {
@@ -117,6 +119,8 @@ namespace PiaNO.Plot
             set { Values["join_style"] = ((int)value).ToString(); }
         }
 
+        #endregion
+
         #region Constructors
 
         public PlotStyle() : base()
@@ -131,7 +135,7 @@ namespace PiaNO.Plot
             VirtualPenNumber = 0;
             Screen = 100;
             LinePatternSize = 0.5;
-            Linetype = 31;
+            Linetype = Plot.Linetype.FromObject;
             AdaptiveLinetype = true;
             LineWeight = 0;
             FillStyle = FillStyle.FromObject;
@@ -154,10 +158,9 @@ namespace PiaNO.Plot
 
         public override string ToString()
         {
-            return this.Name;
+            return Name;
         }
 
         #endregion
-
     }
 }

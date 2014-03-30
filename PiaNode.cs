@@ -57,6 +57,8 @@ namespace PiaNO
 
         #endregion
 
+        #region Methods
+
         protected internal static Color? _getColor(string input)
         {
             var colorVal = int.Parse(input);
@@ -65,7 +67,6 @@ namespace PiaNO
 
             return Color.FromArgb(colorVal);
         }
-
 
         public virtual PiaNode this[string name]
         {
@@ -90,6 +91,8 @@ namespace PiaNO
         {
             return this.NodeName;
         }
+
+        #endregion
 
         #region ICloneable
 
@@ -190,7 +193,5 @@ namespace PiaNO
         }
 
         #endregion
-
-        
     }
 }

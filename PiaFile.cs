@@ -9,6 +9,7 @@ namespace PiaNO
         #region Properties
 
         public PiaHeader Header { get; private set; }
+        public string FileName { get; set; }
 
         #endregion
 
@@ -56,6 +57,11 @@ namespace PiaNO
                 }
 
                 Deserialize();
+                FileName = stream is FileStream
+                    ? ((FileStream)stream).Name
+                    : string.Empty;
+
+                _setOwnership(this);
             }
             catch (Exception)
             {
@@ -75,6 +81,22 @@ namespace PiaNO
         public void Write(Stream stream)
         {
 
+        }
+
+        private void _setOwnership(PiaNode node)
+        {
+            foreach (var child in node.ChildNodes)
+            {
+                if (child.HasChildNodes)
+                    _setOwnership(child);
+                else
+                    child.Owner = this;
+            }
+        }
+
+        public override string ToString()
+        {
+            return Path.GetFileName(FileName);
         }
 
         #endregion
