@@ -5,7 +5,7 @@ namespace PiaNO
     public class PiaHeader
     {
         private const string PIA_HEADER_FORMAT = @"PIAFILEVERSION_{0},{1}VER{2},compress\r\npmzlibcodec\255\255\255\255\255\255\255\000\255\255\255\000";
-        private string _rawData;
+        private string _headerData;
 
         public double PiaFileVersion { get; private set; }
         public short TypeVersion { get; private set; }
@@ -13,7 +13,7 @@ namespace PiaNO
 
         public PiaHeader(string headerString)
         {
-            _rawData = headerString;
+            _headerData = headerString;
 
             var firstLine = headerString.Split()[0];
             var headerArray = headerString.Split(new char[] { ',', '_'});
@@ -31,7 +31,18 @@ namespace PiaNO
 
         public override string ToString()
         {
-            return string.Format(PIA_HEADER_FORMAT, PiaFileVersion, PiaType, TypeVersion);
+            return _headerData;
+            //var fileversionString = string.Format("{0:0.0}", Math.Truncate(PiaFileVersion * 10) / 10);
+            //return string.Format(PIA_HEADER_FORMAT, fileversionString, PiaType, TypeVersion);
+        }
+
+        public byte[] ToByteArray()
+        {
+            var headerString = this.ToString();
+            var bytes = new byte[headerString.Length * sizeof(char)];
+            System.Buffer.BlockCopy(headerString.ToCharArray(), 0, bytes, 0, bytes.Length);
+
+            return bytes;
         }
     }
 }

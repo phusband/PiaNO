@@ -38,9 +38,9 @@
 using System;
 
 using PiaNO;
-using PiaNO.Compression.Streams;
+using PiaNO.Zip.Streams;
 
-namespace PiaNO.Compression
+namespace PiaNO.Zip.Compression
 {
 
     /// <summary>

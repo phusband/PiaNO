@@ -39,7 +39,7 @@
 
 using System;
 
-namespace PiaNO.Compression
+namespace PiaNO.Zip.Compression
 {
 
     /// <summary>

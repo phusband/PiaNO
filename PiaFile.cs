@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
-using PiaNO.Compression.Streams;
+using PiaNO.Zip.Compression;
+using PiaNO.Zip.Streams;
 
 namespace PiaNO
 {
@@ -32,8 +33,10 @@ namespace PiaNO
 
             try
             {
-                var piaStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                Read(piaStream);
+                using (var piaStream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+                {
+                    Read(piaStream);
+                }
             }
             catch (Exception)
             {
@@ -52,7 +55,7 @@ namespace PiaNO
                 
                 using (var zStream = new InflaterInputStream(stream))
                 {
-                    var sr = new StreamReader(zStream);
+                    var sr = new StreamReader(zStream, System.Text.Encoding.Default);
                     InnerData = sr.ReadToEnd();
                 }
 
@@ -67,20 +70,40 @@ namespace PiaNO
             {
                 throw;
             }
-            finally
-            {
-                stream.Close();
-                stream.Dispose();
-            }
         }
 
         public void Write(string fileName)
         {
-
+            using (var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+            {
+                Write(fileStream);
+            }
         }
         public void Write(Stream stream)
         {
+            try
+            {
+                var headerBytes = System.Text.Encoding.Default.GetBytes(Header.ToString());
+                stream.Write(headerBytes, 0, headerBytes.Length);
 
+                var piaBytes = System.Text.Encoding.Default.GetBytes(InnerData.ToString());
+                byte[] compressedBytes;
+                using (var ms = new MemoryStream())
+                {
+                    var deflateStream = new DeflaterOutputStream(ms, new Deflater(Deflater.DEFAULT_COMPRESSION));
+                    deflateStream.Write(piaBytes, 0, piaBytes.Length);
+                    deflateStream.Flush();
+                    deflateStream.Finish();
+
+                    compressedBytes = ms.ToArray();
+                }
+
+                stream.Write(compressedBytes, 0, compressedBytes.Length);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         private void _setOwnership(PiaNode node)

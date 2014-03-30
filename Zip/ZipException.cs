@@ -4,21 +4,21 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace PiaNO
+namespace PiaNO.Zip
 {
     [Serializable]
-    public class PiaException : ApplicationException
+    public class ZipException : PiaException
     {
-        protected PiaException(SerializationInfo info, StreamingContext context)
+        protected ZipException(SerializationInfo info, StreamingContext context)
             : base(info, context) { }
 
-        public PiaException()
+        public ZipException()
         { }
 
-        public PiaException(string message)
+        public ZipException(string message)
             : base(message) { }
 
-        public PiaException(string message, Exception innerException)
+        public ZipException(string message, Exception innerException)
             : base(message, innerException) { }
     }
 }

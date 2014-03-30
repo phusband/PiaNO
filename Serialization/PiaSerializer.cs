@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace PiaNO.Serialization
 {
@@ -64,9 +65,14 @@ namespace PiaNO.Serialization
                 }
             }
         }
-        public static Stream Serialize(PiaNode node)
+        public static void Serialize(Stream stream, PiaNode node)
         {
-            throw new NotImplementedException();
+            if (stream == null)
+                throw new ArgumentNullException("Stream");
+
+            if (node == null)
+                throw new ArgumentNullException("Node");
+
         }
 
         public static KeyValuePair<string, string> _getValue(string valueString)

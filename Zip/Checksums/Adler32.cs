@@ -37,7 +37,7 @@
 
 using System;
 
-namespace PiaNO.Compression.Checksums
+namespace PiaNO.Zip.Checksums
 {
 
     /// <summary>

@@ -2,9 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Xml;
 
 using PiaNO.Serialization;
 
@@ -87,9 +86,23 @@ namespace PiaNO
             PiaSerializer.Deserialize(this);               
         }
 
+        protected virtual void Serialize(Stream stream)
+        {
+            PiaSerializer.Serialize(stream, this);
+        }
+
         public override string ToString()
         {
             return this.NodeName;
+        }
+
+        public byte[] ToByteArray()
+        {
+            var headerString = this.ToString();
+            var bytes = new byte[headerString.Length * sizeof(char)];
+            System.Buffer.BlockCopy(headerString.ToCharArray(), 0, bytes, 0, bytes.Length);
+
+            return bytes;
         }
 
         #endregion

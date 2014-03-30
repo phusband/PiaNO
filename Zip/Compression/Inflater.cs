@@ -38,10 +38,10 @@
 // exception statement from your version.
 
 using System;
-using PiaNO.Compression.Checksums;
-using PiaNO.Compression.Streams;
+using PiaNO.Zip.Checksums;
+using PiaNO.Zip.Streams;
 
-namespace PiaNO.Compression
+namespace PiaNO.Zip.Compression
 {
     /// <summary>
     /// Inflater is used to decompress data that has been compressed according

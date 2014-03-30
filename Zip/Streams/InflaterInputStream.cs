@@ -45,9 +45,10 @@ using System.IO;
 
 #if !NETCF_1_0
 using System.Security.Cryptography;
+using PiaNO.Zip.Compression;
 #endif
 
-namespace PiaNO.Compression.Streams
+namespace PiaNO.Zip.Streams
 {
 
     /// <summary>

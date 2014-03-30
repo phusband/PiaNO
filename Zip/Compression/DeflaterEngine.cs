@@ -38,9 +38,9 @@
 // exception statement from your version.
 
 using System;
-using PiaNO.Compression.Checksums;
+using PiaNO.Zip.Checksums;
 
-namespace PiaNO.Compression
+namespace PiaNO.Zip.Compression
 {
 
     /// <summary>
