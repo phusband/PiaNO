@@ -154,22 +154,23 @@ namespace PiaNO.Serialization
 
             var nodeBuilder = new StringBuilder();
             var whiteSpace = new string(' ', level);
+            var newLine = Environment.NewLine;
 
             foreach (var value in node.Values)
-                nodeBuilder.AppendFormat("{0}{1}", whiteSpace, _serializeValue(value));
+                nodeBuilder.AppendFormat("{0}{1}\n", whiteSpace, _serializeValue(value));
 
             foreach (var child in node.ChildNodes)
             {
-                nodeBuilder.AppendFormat("{0}{1}{2}\r\n", whiteSpace, child.NodeName, '{');
+                nodeBuilder.AppendFormat("{0}{1}{2}\n", whiteSpace, child.NodeName, "{");
                 nodeBuilder.Append(_serializeNode(child, level + 1));
-                nodeBuilder.AppendFormat("{0}{1}\r\n", whiteSpace, '}');
+                nodeBuilder.AppendFormat("{0}{1}\n", whiteSpace, "}");
             }
 
             return nodeBuilder.ToString();
         }
         private static string _serializeValue(KeyValuePair<string, string> value)
         {
-            var valueString = string.Format("{0}={1}\r\n", value.Key, value.Value);
+            var valueString = string.Format("{0}={1}", value.Key, value.Value);
             valueString = valueString.Replace("_str=", "=\"");
 
             return valueString;
