@@ -1,11 +1,9 @@
-﻿using System;
+﻿using PiaNO.Serialization;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-
-using PiaNO.Serialization;
 
 namespace PiaNO
 {
@@ -34,7 +32,10 @@ namespace PiaNO
         {
             get { return ChildNodes != null && ChildNodes.Count > 0; }
         }
-        public string InnerData { get; protected set; }
+        public string InnerData
+        {
+            get { return PiaSerializer._serializeNode(this); }
+        }
 
         #endregion
 
@@ -50,8 +51,7 @@ namespace PiaNO
             ChildNodes = new List<PiaNode>();
             Values = new Dictionary<string, string>();
 
-            InnerData = innerData;
-            Deserialize();
+            PiaSerializer._deserializeNode(this, innerData);
         }
 
         #endregion
@@ -81,28 +81,9 @@ namespace PiaNO
             }
         }
 
-        protected virtual void Deserialize()
-        {
-            PiaSerializer.Deserialize(this);               
-        }
-
-        protected virtual void Serialize(Stream stream)
-        {
-            PiaSerializer.Serialize(stream, this);
-        }
-
         public override string ToString()
         {
             return this.NodeName;
-        }
-
-        public byte[] ToByteArray()
-        {
-            var headerString = this.ToString();
-            var bytes = new byte[headerString.Length * sizeof(char)];
-            System.Buffer.BlockCopy(headerString.ToCharArray(), 0, bytes, 0, bytes.Length);
-
-            return bytes;
         }
 
         #endregion

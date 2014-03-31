@@ -1,7 +1,5 @@
-﻿using PiaNO.Serialization;
-using System;
+﻿using System;
 using System.Drawing;
-using System.IO;
 
 namespace PiaNO.Plot
 {
@@ -11,18 +9,18 @@ namespace PiaNO.Plot
 
         public string Name
         {
-            get { return Values["name"]; }
-            set { Values["name"] = value; }
+            get { return Values["name_str"]; }
+            set { Values["name_str"] = value; }
         }
         public string LocalizedName
         {
-            get { return Values["localized_name"]; }
-            set { Values["localized_name"] = value; }
+            get { return Values["localized_name_str"]; }
+            set { Values["localized_name_str"] = value; }
         }
         public string Description
         {
-            get { return Values["description"]; }
-            set { Values["description"] = value; }
+            get { return Values["description_str"]; }
+            set { Values["description_str"] = value; }
         }
         public Color? Color
         {
@@ -125,7 +123,7 @@ namespace PiaNO.Plot
 
         public PlotStyle() : base()
         {
-            NodeName = "Style 1";
+            NodeName = "New style";
             LocalizedName = string.Empty;
             Description = string.Empty;
             //Color = null;
@@ -149,7 +147,6 @@ namespace PiaNO.Plot
             Parent = baseNode.Parent;
             Owner = baseNode.Owner;
             Values = baseNode.Values;
-            InnerData = baseNode.InnerData;
         }
 
         #endregion

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace PiaNO.Plot
@@ -20,8 +19,8 @@ namespace PiaNO.Plot
 
         public string Description
         {
-            get { return Values["description"]; }
-            set { Values["description"] = value; }
+            get { return Values["description_str"]; }
+            set { Values["description_str"] = value; }
         }
 
         public bool AciTableAvailable
@@ -69,9 +68,8 @@ namespace PiaNO.Plot
             ApplyFactor = false;
             CustomLineweightDisplayUnits = 1;
         }
-        protected PlotStyleTable(string innerData) : base(innerData)
-        {
-        }
+        public PlotStyleTable(string fileName)
+            : base(fileName) { }
 
         #endregion
 
@@ -112,6 +110,5 @@ namespace PiaNO.Plot
         }
 
         #endregion
-
     }
 }

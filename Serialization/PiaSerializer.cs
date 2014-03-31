@@ -1,23 +1,58 @@
-﻿using System;
+﻿using PiaNO.Zip.Compression;
+using PiaNO.Zip.Streams;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml.Serialization;
 
 namespace PiaNO.Serialization
 {
     public static class PiaSerializer
     {
-        public static void Deserialize(PiaNode node)
+        public static void Deserialize(Stream stream, PiaFile piaFile)
         {
-            if (node == null)
-                throw new ArgumentNullException("Node");
+            if (stream == null)
+                throw new ArgumentNullException("Stream");
 
-            if (String.IsNullOrEmpty(node.InnerData))
-                throw new ArgumentNullException("InnerData");
+            if (piaFile == null)
+                throw new ArgumentNullException("PiaFile");
 
-            var dataLines = node.InnerData.Split(new char[]{'\r', '\n'},
+            try
+            {
+                // Header
+                var headerBytes = new Byte[60];
+                stream.Read(headerBytes, 0, headerBytes.Length);
+                var headerString = Encoding.Default.GetString(headerBytes);
+                piaFile.Header = new PiaHeader(headerString);
+
+                // Inflation
+                string inflatedString;
+                using (var zStream = new InflaterInputStream(stream))
+                {
+                    var sr = new StreamReader(zStream, Encoding.Default);
+                    inflatedString = sr.ReadToEnd();
+                }
+
+                // Nodes
+                piaFile.Owner = piaFile;
+                _deserializeNode(piaFile, inflatedString);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+        }
+        internal static void _deserializeNode(PiaNode parent, string nodeString)
+        {
+            if (parent == null && !(parent is PiaFile))
+                throw new ArgumentNullException("parent");
+
+            if (nodeString == null)
+                throw new ArgumentNullException("nodeString");
+
+            var dataLines = nodeString.Split(new char[] { '\r', '\n' },
                                             StringSplitOptions.RemoveEmptyEntries);
 
             for (int i = 0; i < dataLines.Length; i++)
@@ -25,12 +60,12 @@ namespace PiaNO.Serialization
                 var curLine = dataLines[i];
                 if (curLine.Contains('='))
                 {
-                    var value = _getValue(curLine);
+                    var value = _deserializeValue(curLine);
 
-                    if (!node.Values.ContainsKey(value.Key))
-                        node.Values.Add(value.Key, value.Value);
+                    if (!parent.Values.ContainsKey(value.Key))
+                        parent.Values.Add(value.Key, value.Value);
                     else
-                        node.Values[value.Key] = value.Value;
+                        parent.Values[value.Key] = value.Value;
                 }
                 else if (curLine.Contains('{'))
                 {
@@ -53,32 +88,91 @@ namespace PiaNO.Serialization
                     var childNode = new PiaNode(nodeBuilder.ToString())
                     {
                         NodeName = curLine.Trim().TrimEnd('{'),
-                        Parent = node,
+                        Parent = parent,
+                        Owner = parent.Owner
                     };
-                    if (node is PiaFile)
-                        childNode.Owner = (PiaFile)node;
-                    else
-                        childNode.Owner = node.Owner;
 
-                    node.ChildNodes.Add(childNode);
+                    parent.ChildNodes.Add(childNode);
+
                     i = n - 1;
                 }
             }
         }
-        public static void Serialize(Stream stream, PiaNode node)
+        private static KeyValuePair<string, string> _deserializeValue(string valueString)
+        {
+            var prop = valueString.TrimEnd(new char[] { '\r', '\n' }).Split('=');
+            if (prop[1].StartsWith("\""))
+            {
+                prop[0] += "_str";
+                prop[1] = prop[1].TrimStart('\"');
+            }
+
+            return new KeyValuePair<string, string>(prop[0].Trim(), prop[1].Trim());
+        }
+
+        public static void Serialize(Stream stream, PiaFile piaFile)
         {
             if (stream == null)
                 throw new ArgumentNullException("Stream");
 
-            if (node == null)
-                throw new ArgumentNullException("Node");
+            if (piaFile == null)
+                throw new ArgumentNullException("PiaFile");
 
+            try
+            {
+                // Header
+                var headerString = piaFile.Header.ToString();
+                var headerBytes = Encoding.Default.GetBytes(headerString);
+                stream.Write(headerBytes, 0, headerBytes.Length);
+
+                // Nodes
+                var nodeString = _serializeNode(piaFile);
+                var nodeBytes = Encoding.Default.GetBytes(nodeString);
+
+                // Deflation
+                byte[] deflatedBytes;
+                using (var ms = new MemoryStream())
+                {
+                    var deflateStream = new DeflaterOutputStream(ms, new Deflater(Deflater.DEFAULT_COMPRESSION));
+                    deflateStream.Write(nodeBytes, 0, nodeBytes.Length);
+                    deflateStream.Flush();
+                    deflateStream.Finish();
+
+                    deflatedBytes = ms.ToArray();
+                }
+                stream.Write(deflatedBytes, 0, deflatedBytes.Length);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
-
-        public static KeyValuePair<string, string> _getValue(string valueString)
+        internal static string _serializeNode(PiaNode node, int level = 0)
         {
-            var prop = valueString.TrimEnd(new char[] {'\r', '\n'}).Split('=');
-            return new KeyValuePair<string,string>(prop[0].Trim(), prop[1].TrimStart('\"'));
+            if (node == null)
+                throw new ArgumentNullException("node");
+
+            var nodeBuilder = new StringBuilder();
+            var whiteSpace = new string(' ', level);
+
+            foreach (var value in node.Values)
+                nodeBuilder.AppendFormat("{0}{1}", whiteSpace, _serializeValue(value));
+
+            foreach (var child in node.ChildNodes)
+            {
+                nodeBuilder.AppendFormat("{0}{1}{2}\r\n", whiteSpace, child.NodeName, '{');
+                nodeBuilder.Append(_serializeNode(child, level + 1));
+                nodeBuilder.AppendFormat("{0}{1}\r\n", whiteSpace, '}');
+            }
+
+            return nodeBuilder.ToString();
+        }
+        private static string _serializeValue(KeyValuePair<string, string> value)
+        {
+            var valueString = string.Format("{0}={1}\r\n", value.Key, value.Value);
+            valueString = valueString.Replace("_str=", "=\"");
+
+            return valueString;
         }
     }
 }

@@ -1,7 +1,6 @@
-﻿using System;
+﻿using PiaNO.Serialization;
+using System;
 using System.IO;
-using PiaNO.Zip.Compression;
-using PiaNO.Zip.Streams;
 
 namespace PiaNO
 {
@@ -9,7 +8,7 @@ namespace PiaNO
     {
         #region Properties
 
-        public PiaHeader Header { get; private set; }
+        public PiaHeader Header { get; internal set; }
         public string FileName { get; set; }
 
         #endregion
@@ -17,7 +16,10 @@ namespace PiaNO
         #region Constructors
 
         protected internal PiaFile() : base() { }
-        protected internal PiaFile(string innerData) : base(innerData) { }
+        protected PiaFile(string filePath) : base()
+        {
+            Read(filePath);
+        }
 
         #endregion
 
@@ -33,9 +35,11 @@ namespace PiaNO
 
             try
             {
-                using (var piaStream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+                FileName = Path.GetFileName(fileName);
+                using (var inStream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
                 {
-                    Read(piaStream);
+                    PiaSerializer.Deserialize(inStream, this);
+                    inStream.Close();
                 }
             }
             catch (Exception)
@@ -44,76 +48,19 @@ namespace PiaNO
             }
 
         }
-        public void Read(Stream stream)
-        {
-            try
-            {
-                var headerBytes = new Byte[60];
-                stream.Read(headerBytes, 0, headerBytes.Length);
-                var headerString = System.Text.Encoding.Default.GetString(headerBytes);
-                Header = new PiaHeader(headerString);
-                
-                using (var zStream = new InflaterInputStream(stream))
-                {
-                    var sr = new StreamReader(zStream, System.Text.Encoding.Default);
-                    InnerData = sr.ReadToEnd();
-                }
-
-                Deserialize();
-                FileName = stream is FileStream
-                    ? ((FileStream)stream).Name
-                    : string.Empty;
-
-                _setOwnership(this);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
         public void Write(string fileName)
         {
-            using (var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-            {
-                Write(fileStream);
-            }
-        }
-        public void Write(Stream stream)
-        {
             try
             {
-                var headerBytes = System.Text.Encoding.Default.GetBytes(Header.ToString());
-                stream.Write(headerBytes, 0, headerBytes.Length);
-
-                var piaBytes = System.Text.Encoding.Default.GetBytes(InnerData.ToString());
-                byte[] compressedBytes;
-                using (var ms = new MemoryStream())
+                using (var outStream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
                 {
-                    var deflateStream = new DeflaterOutputStream(ms, new Deflater(Deflater.DEFAULT_COMPRESSION));
-                    deflateStream.Write(piaBytes, 0, piaBytes.Length);
-                    deflateStream.Flush();
-                    deflateStream.Finish();
-
-                    compressedBytes = ms.ToArray();
+                    PiaSerializer.Serialize(outStream, this);
+                    outStream.Close();
                 }
-
-                stream.Write(compressedBytes, 0, compressedBytes.Length);
             }
             catch (Exception)
             {
                 throw;
-            }
-        }
-
-        private void _setOwnership(PiaNode node)
-        {
-            foreach (var child in node.ChildNodes)
-            {
-                if (child.HasChildNodes)
-                    _setOwnership(child);
-                else
-                    child.Owner = this;
             }
         }
 
