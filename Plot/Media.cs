@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿//
+//  Copyright © 2014 Parrish Husband (parrish.husband@gmail.com)
+//  The MIT License (MIT) - See LICENSE.txt for further details.
+//
 
 namespace PiaNO.Plot
 {
@@ -12,7 +12,5 @@ namespace PiaNO.Plot
         public long UIOwner;
         public double SizeMaxX { get; set; } // Some encoding here
         public double SizeMaxY { get; set; } // ^
-
-
     }
 }

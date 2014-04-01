@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿//
+//  Copyright © 2014 Parrish Husband (parrish.husband@gmail.com)
+//  The MIT License (MIT) - See LICENSE.txt for further details.
+//
+
+using System;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace PiaNO
 {
