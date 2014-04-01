@@ -1,8 +1,8 @@
-PiaNo
+PiaNO
 =====
 
 PIA file reader/writer.
 
-Designed as a reference library for opening and modifying AutoDesk plot configuration files (.pc3, .pmp, .stb, .ctb).
+A reference library for opening and modifying AutoDesk plot files (.pc3, .pmp, .stb, .ctb).
 
 
