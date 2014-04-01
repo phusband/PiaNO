@@ -1,22 +1,34 @@
-﻿using PiaNO.Serialization;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using PiaNO.Serialization;
 
 namespace PiaNO
 {
-    public class PiaNode : ICloneable, IEquatable<PiaNode>, IList<PiaNode>
+    public class PiaNode : ICloneable, IEquatable<PiaNode>, IEnumerable<PiaNode>
     {
         #region Properties
 
+        private IList<PiaNode> _childNodes;
+
         protected internal IList<PiaNode> ChildNodes
-        { 
-            get {return _childNodes ?? (_childNodes = new List<PiaNode>()); }
+        {
+            get { return _childNodes ?? (_childNodes = new List<PiaNode>()); }
             set { _childNodes = value; }
         }
-        private IList<PiaNode> _childNodes;
+        protected internal bool HasChildNodes
+        {
+            get { return ChildNodes != null && ChildNodes.Count > 0; }
+        }
+        protected internal string InnerData
+        {
+            get { return PiaSerializer._serializeNode(this); }
+        }
+        protected internal string NodeName { get; set; }
+        protected internal PiaFile Owner { get; set; }
+        protected internal PiaNode Parent { get; set; }
 
         protected internal Dictionary<string, string> Values
         {
@@ -25,23 +37,11 @@ namespace PiaNO
         }
         private Dictionary<string, string> _values;
 
-        public string NodeName { get; set; }
-        public PiaFile Owner { get; protected internal set; }
-        public PiaNode Parent { get; protected internal set; }
-        public bool HasChildNodes
-        {
-            get { return ChildNodes != null && ChildNodes.Count > 0; }
-        }
-        public string InnerData
-        {
-            get { return PiaSerializer._serializeNode(this); }
-        }
-
         #endregion
 
         #region Constructors
 
-        protected PiaNode()
+        protected internal PiaNode()
         {
             ChildNodes = new List<PiaNode>();
             Values = new Dictionary<string, string>();
@@ -58,7 +58,27 @@ namespace PiaNO
 
         #region Methods
 
-        protected internal static Color? _getColor(string input)
+        protected string GetValue(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException("key");
+
+            if (!Values.ContainsKey(key))
+                Values.Add(key, string.Empty);
+            
+            return Values[key];
+        }
+        protected void SetValue(string key, string value)
+        {
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException("key");
+
+            if (!Values.ContainsKey(key))
+                Values.Add(key, value);
+            else
+                Values[key] = value;
+        }
+        protected internal static Color? GetColor(string input)
         {
             var colorVal = int.Parse(input);
             if (colorVal == -1)
@@ -112,69 +132,7 @@ namespace PiaNO
 
         #endregion
 
-        #region IList
-
-        public int IndexOf(PiaNode item)
-        {
-            return ChildNodes.IndexOf(item);
-        }
-
-        public virtual void Insert(int index, PiaNode item)
-        {
-            ChildNodes.Insert(index, item);
-        }
-
-        public virtual void RemoveAt(int index)
-        {
-            ChildNodes.RemoveAt(index);
-        }
-
-        public PiaNode this[int index]
-        {
-            get
-            {
-                return ChildNodes[index];
-            }
-            set
-            {
-                ChildNodes[index] = value;
-            }
-        }
-
-        public virtual void Add(PiaNode item)
-        {
-            ChildNodes.Add(item);
-        }
-
-        public virtual void Clear()
-        {
-            ChildNodes.Clear();
-        }
-
-        public bool Contains(PiaNode item)
-        {
-            return ChildNodes.Contains(item);
-        }
-
-        public void CopyTo(PiaNode[] array, int arrayIndex)
-        {
-            ChildNodes.CopyTo(array, arrayIndex);
-        }
-
-        public int Count
-        {
-            get { return ChildNodes.Count; }
-        }
-
-        public bool IsReadOnly
-        {
-            get { return ChildNodes.IsReadOnly; }
-        }
-
-        public virtual bool Remove(PiaNode item)
-        {
-            return ChildNodes.Remove(item);
-        }
+        #region IEnumerable
 
         public IEnumerator<PiaNode> GetEnumerator()
         {

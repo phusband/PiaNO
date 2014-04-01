@@ -1,10 +1,11 @@
-﻿using PiaNO.Zip.Compression;
-using PiaNO.Zip.Streams;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using PiaNO.Zip.Checksums;
+using PiaNO.Zip.Compression;
+using PiaNO.Zip.Streams;
 
 namespace PiaNO.Serialization
 {
@@ -21,13 +22,14 @@ namespace PiaNO.Serialization
             try
             {
                 // Header
-                var headerBytes = new Byte[60];
+                var headerBytes = new Byte[48]; // Ignore 12 byte checksum
                 stream.Read(headerBytes, 0, headerBytes.Length);
                 var headerString = Encoding.Default.GetString(headerBytes);
                 piaFile.Header = new PiaHeader(headerString);
 
                 // Inflation
                 string inflatedString;
+                stream.Seek(60, SeekOrigin.Begin);
                 using (var zStream = new InflaterInputStream(stream))
                 {
                     var sr = new StreamReader(zStream, Encoding.Default);
@@ -131,15 +133,24 @@ namespace PiaNO.Serialization
 
                 // Deflation
                 byte[] deflatedBytes;
+                var deflater = new Deflater(Deflater.DEFAULT_COMPRESSION);
                 using (var ms = new MemoryStream())
                 {
-                    var deflateStream = new DeflaterOutputStream(ms, new Deflater(Deflater.DEFAULT_COMPRESSION));
+                    var deflateStream = new DeflaterOutputStream(ms, deflater);
                     deflateStream.Write(nodeBytes, 0, nodeBytes.Length);
-                    deflateStream.Flush();
                     deflateStream.Finish();
 
                     deflatedBytes = ms.ToArray();
                 }
+
+                // Checksum
+                var checkSum = new byte[12];
+                BitConverter.GetBytes(deflater.Adler).CopyTo(checkSum, 0); // Adler
+                BitConverter.GetBytes(nodeBytes.Length).CopyTo(checkSum, 4); // InflatedSize
+                BitConverter.GetBytes(deflatedBytes.Length).CopyTo(checkSum, 8); // DeflatedSize
+                stream.Write(checkSum, 0, checkSum.Length);
+
+                // Final write
                 stream.Write(deflatedBytes, 0, deflatedBytes.Length);
             }
             catch (Exception)

@@ -84,8 +84,8 @@ namespace PiaNO.Zip.Checksums
     ///    checked separately. (Any sequence of zeroes has a Fletcher
     ///    checksum of zero.)"
     /// </summary>
-    /// <see cref="ICSharpCode.SharpZipLib.Zip.Compression.Streams.InflaterInputStream"/>
-    /// <see cref="ICSharpCode.SharpZipLib.Zip.Compression.Streams.DeflaterOutputStream"/>
+    /// <see cref="InputStream"/>
+    /// <see cref="DeflaterOutputStream"/>
     public sealed class Adler32 : IChecksum
     {
         /// <summary>

@@ -7,128 +7,119 @@ namespace PiaNO.Plot
     {
         #region Properties
 
+        private const string USE_OBJECT_COLOR = "-1006632961";
+
         public string Name
         {
-            get { return Values["name_str"]; }
-            set { Values["name_str"] = value; }
+            get { return GetValue("name_str"); }
+            set { SetValue("name_str", value); }
         }
         public string LocalizedName
         {
-            get { return Values["localized_name_str"]; }
-            set { Values["localized_name_str"] = value; }
+            get { return GetValue("localized_name_str"); }
+            set { SetValue("localized_name_str", value); }
         }
         public string Description
         {
-            get { return Values["description_str"]; }
-            set { Values["description_str"] = value; }
+            get { return GetValue("description_str"); }
+            set { SetValue("description_str", value); }
         }
         public Color? Color
         {
             get
             {
-                if (!Values.ContainsKey("color"))
-                    return null;
-                return _getColor(Values["color"]);
+                var color = GetValue("color");
+                return color != null ? GetColor(color) : null;
             }
-            //set
-            //{
-            //    if (!Values.ContainsKey("color"))
-            //        Values.Add("color", value.ToString());
-            //    else
-            //        Values["color"] = value.ToString();
-            //}
+            set { SetValue("color", value == null ? USE_OBJECT_COLOR : value.ToString()); }
         }
         public Color? ModeColor
         {
             get
             {
-                if (!Values.ContainsKey("mode_color"))
-                    return null;
-                return _getColor(Values["mode_color"]);
+                var color = GetValue("mode_color");
+                return color != null ? GetColor(color) : null;
             }
-            set
-            {
-                if (Values.ContainsKey("mode_color"))
-                    Values["mode_color"] = value.ToString();
-            }
+            set { SetValue("mode_color", value == null ? USE_OBJECT_COLOR : value.ToString()); }
         }
         public short ColorPolicy
         {
-            get { return short.Parse(Values["color_policy"]); }
-            set { Values["color_policy"] = value.ToString(); }
+            get { return short.Parse(GetValue("color_policy")); }
+            set { SetValue("color_policy", value.ToString()); }
         }
         public bool EnableDithering
         {
-            get { return ColorPolicy % 2 == 1; }
-            //set;
+            get { return ColorPolicy % 2 == 1; } // Pretty sure this is bitwise
+            
         }
         public bool ConvertoToGrayscale
         {
-            get { return ColorPolicy == 2 || ColorPolicy == 3; }
+            get { return ColorPolicy == 2 || ColorPolicy == 3; } // Pretty sure this is bitwise
         }
         public short PhysicalPenNumber
         {
-            get { return short.Parse(Values["physical_pen_number"]); }
-            set { Values["physical_pen_number"] = value.ToString(); }
+            get { return short.Parse(GetValue("physical_pen_number")); }
+            set { SetValue("physical_pen_number", value.ToString()); }
         }
         public short VirtualPenNumber
         {
-            get { return short.Parse(Values["virtual_pen_number"]); }
-            set { Values["virtual_pen_number"] = value.ToString(); }
+            get { return short.Parse(GetValue("virtual_pen_number")); }
+            set { SetValue("virtual_pen_number", value.ToString()); }
         }
         public short Screen
         {
-            get { return short.Parse(Values["screen"]); }
-            set { Values["screen"] = value.ToString(); }
+            get { return short.Parse(GetValue("screen")); }
+            set { SetValue("screen", value.ToString()); }
         }
         public double LinePatternSize
         {
-            get { return double.Parse(Values["linepattern_size"]); }
-            set { Values["linepattern_size"] = value.ToString(); }
+            get { return double.Parse(GetValue("linepattern_size")); }
+            set { SetValue("linepattern_size", value.ToString()); }
         }
         public Linetype Linetype
         {
-            get { return (Linetype)Enum.Parse(typeof(Linetype), Values["linetype"]); }
-            set { Values["linetype"] = ((int)value).ToString(); }
+            get { return (Linetype)Enum.Parse(typeof(Linetype), GetValue("linetype")); }
+            set { SetValue("linetype", ((int)value).ToString()); }
         }
         public bool AdaptiveLinetype
         {
-            get { return bool.Parse(Values["adaptive_linetype"]); }
-            set { Values["adaptive_linetype"] = value.ToString().ToUpper(); }
+            get { return bool.Parse(GetValue("adaptive_linetype")); }
+            set { SetValue("adaptive_linetype", value.ToString().ToUpper()); }
         }
         public short LineWeight
         {
-            get { return short.Parse(Values["lineweight"]); }
-            set { Values["lineweight"] = value.ToString(); }
+            get { return short.Parse(GetValue("lineweight")); }
+            set { SetValue("lineweight", value.ToString()); }
         }
         public FillStyle FillStyle
         {
-            get { return (FillStyle)Enum.Parse(typeof(FillStyle), Values["fill_style"]); }
-            set { Values["fill_style"] = ((int)value).ToString(); }
+            get { return (FillStyle)Enum.Parse(typeof(FillStyle), GetValue("fill_style")); }
+            set { SetValue("fill_style", ((int)value).ToString()); }
         }
         public EndStyle EndStyle
         {
-            get { return (EndStyle)Enum.Parse(typeof(EndStyle), Values["end_style"]); }
-            set { Values["end_style"] = ((int)value).ToString(); }
+            get { return (EndStyle)Enum.Parse(typeof(EndStyle), GetValue("end_style")); }
+            set { SetValue("end_style", ((int)value).ToString()); }
         }
         public JoinStyle JoinStyle
         {
-            get { return (JoinStyle)Enum.Parse(typeof(JoinStyle), Values["join_style"]); }
-            set { Values["join_style"] = ((int)value).ToString(); }
+            get { return (JoinStyle)Enum.Parse(typeof(JoinStyle), GetValue("join_style")); }
+            set { SetValue("join_style", ((int)value).ToString()); }
         }
 
         #endregion
 
         #region Constructors
 
-        public PlotStyle() : base()
+        public PlotStyle()
+            : base()
         {
-            NodeName = "New style";
+            Name = "New style"; // needs to be iterative based on existing nodes
             LocalizedName = string.Empty;
             Description = string.Empty;
-            //Color = null;
+            Color = null;
             ModeColor = null;
-            ColorPolicy = 2;
+            ColorPolicy = 1;
             PhysicalPenNumber = 0;
             VirtualPenNumber = 0;
             Screen = 100;
@@ -140,7 +131,9 @@ namespace PiaNO.Plot
             EndStyle = EndStyle.FromObject;
             JoinStyle = JoinStyle.FromObject;
         }
-        protected internal PlotStyle(string innerData) : base(innerData) { }
+        protected internal PlotStyle(string innerData)
+            : base(innerData) { }
+
         internal PlotStyle(PiaNode baseNode)
         {
             NodeName = baseNode.NodeName;

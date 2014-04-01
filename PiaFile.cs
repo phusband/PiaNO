@@ -25,6 +25,13 @@ namespace PiaNO
 
         #region Methods
 
+        public void Read()
+        {
+            if (string.IsNullOrEmpty(this.FileName))
+                throw new ArgumentNullException("FileName");
+
+            Read(this.FileName);
+        }
         public void Read(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
@@ -47,6 +54,14 @@ namespace PiaNO
                 throw;
             }
 
+        }
+
+        public void Write()
+        {
+            if (string.IsNullOrEmpty(this.FileName))
+                throw new ArgumentNullException("FileName");
+
+            Write(this.FileName);
         }
         public void Write(string fileName)
         {

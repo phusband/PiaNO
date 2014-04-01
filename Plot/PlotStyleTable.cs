@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PiaNO.Plot
@@ -7,11 +8,16 @@ namespace PiaNO.Plot
     {
         #region Properties
 
-        public IList<PlotStyle> PlotStyles
+        private int _nextStyleNode
         {
-            get { return _getPlotStyles(); }
-            set { _setStyles(value); }
+            get { return _getNextStyleNode(); }
         }
+
+        public IEnumerable<PlotStyle> PlotStyles
+        {
+            get { return _getPlotStyles().ToList().AsReadOnly(); }
+        }
+
         public IDictionary<int, double> Lineweights
         {
             get { return _getLineWeights(); }
@@ -20,41 +26,31 @@ namespace PiaNO.Plot
         public string Description
         {
             get { return Values["description_str"]; }
-            set { Values["description_str"] = value; }
+            set { SetValue("description_str", value); }
         }
 
         public bool AciTableAvailable
         {
             get { return bool.Parse(Values["aci_table_available"]); }
-            set
-            {
-                Values["aci_table_available"] = value
-                ? "TRUE"
-                : "FALSE";
-            }
+            set { SetValue("aci_table_available", value.ToString().ToUpper()); }
         }
 
         public double ScaleFactor
         {
             get { return double.Parse(Values["scale_factor"]); }
-            set { Values["scale_factor"] = value.ToString(); }
+            set { SetValue("scale_factor", value.ToString()); }
         }
 
         public bool ApplyFactor
         {
             get { return bool.Parse(Values["apply_factor"]); }
-            set
-            {
-                Values["apply_factor"] = value
-                ? "TRUE"
-                : "FALSE";
-            }
+            set { SetValue("apply_factor", value.ToString().ToUpper()); }
         }
 
         public double CustomLineweightDisplayUnits
         {
             get { return double.Parse(Values["custom_lineweight_display_units"]); }
-            set { Values["custom_lineweight_display_units"] = value.ToString(); }
+            set { SetValue("custom_lineweight_display_units", value.ToString()); }
         }
 
         #endregion
@@ -63,7 +59,6 @@ namespace PiaNO.Plot
 
         public PlotStyleTable() : base()
         {
-            AciTableAvailable = false;
             ScaleFactor = 1.0;
             ApplyFactor = false;
             CustomLineweightDisplayUnits = 1;
@@ -75,7 +70,18 @@ namespace PiaNO.Plot
 
         #region Methods
 
-        protected virtual List<PlotStyle> _getPlotStyles()
+        private int _getNextStyleNode()
+        {
+            var styleNode = this["plot_style"];
+            if (styleNode == null)
+                throw new NotImplementedException("Create style node if it doesn't exist!");
+
+            return !styleNode.HasChildNodes
+                    ? 0
+                    : styleNode.ChildNodes.Count;
+        }
+
+        protected virtual IEnumerable<PlotStyle> _getPlotStyles()
         {
             if (!HasChildNodes)
                 return null;
@@ -85,7 +91,7 @@ namespace PiaNO.Plot
                 return null;
 
             var styles = styleNode.ChildNodes;
-            return styles.Select(s => new PlotStyle(s)).ToList();
+            return styles.Select(s => new PlotStyle(s));
         }
         protected Dictionary<int, double> _getLineWeights()
         {
@@ -100,13 +106,20 @@ namespace PiaNO.Plot
             return weights.ToDictionary(w => int.Parse(w.Key), w => double.Parse(w.Value));
         }
 
-        private void _setStyles(IList<PlotStyle> value)
+        public virtual void AddStyle(PlotStyle style)
         {
+            if (style == null)
+                throw new ArgumentNullException("style");
+
+            if (PlotStyles.Contains(style))
+                throw new ArgumentException(string.Format("Style '{0}' already exists.", style.Name));
+
             var styleNode = this["plot_style"];
             if (styleNode == null)
-                return;
+                throw new NotImplementedException("Create style node if it doesn't exist!");
 
-            styleNode.ChildNodes = (List<PiaNode>)value;
+            style.NodeName = _nextStyleNode.ToString();
+            styleNode.ChildNodes.Add(style);
         }
 
         #endregion

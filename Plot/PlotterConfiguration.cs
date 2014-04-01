@@ -93,6 +93,9 @@ namespace PiaNO.Plot
 
         #region Constructors
 
+        public PlotterConfiguration() 
+            : base() { }
+
         public PlotterConfiguration(string fileName)
             : base(fileName) { }
 

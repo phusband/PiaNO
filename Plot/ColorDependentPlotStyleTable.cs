@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace PiaNO.Plot
 {
@@ -17,27 +18,15 @@ namespace PiaNO.Plot
 
         public ColorDependentPlotStyleTable() : base()
         {
+            AciTableAvailable = true;
         }
-        protected ColorDependentPlotStyleTable(string rawData) :base(rawData)
-        {
-
-        }
+        public ColorDependentPlotStyleTable(string innerData)
+            : base(innerData) { }
 
         #endregion
 
         #region Methods
 
-        protected override List<PlotStyle> _getPlotStyles()
-        {
-            var styles = new List<PlotStyle>();
-            foreach (var kvp in AciTable)
-                styles.Add(new PlotStyle
-                { 
-                    NodeName = kvp.Key,
-                    Name = kvp.Value
-                });
-            return styles;
-        }
         private IDictionary<string, string> _getAciTable()
         {
             if (!HasChildNodes)
@@ -50,19 +39,11 @@ namespace PiaNO.Plot
             return aciNode.Values;
         }
 
-        public override void Add(PiaNode item) { }
-        public override void Clear()
+        public override void AddStyle(PlotStyle style)
         {
-            PlotStyles.Clear();
+            throw new NotSupportedException("Cannot add styles to .ctb files.");
         }
-        public override void Insert(int index, PiaNode item) { }
-        public override bool Remove(PiaNode item)
-        {
-            return false;
-        }
-        public override void RemoveAt(int index) { }
 
         #endregion
-
     }
 }
