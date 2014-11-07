@@ -4,6 +4,7 @@
 //
 
 using System;
+using System.Globalization;
 
 namespace PiaNO
 {
@@ -24,7 +25,9 @@ namespace PiaNO
             if (headerArray.Length < 4)
                 throw new ArgumentOutOfRangeException();
 
-            PiaFileVersion = Double.Parse(headerArray[1]);
+            NumberFormatInfo wNFI = new NumberFormatInfo();
+            wNFI.CurrencyDecimalSeparator=".";
+            PiaFileVersion = Double.Parse(headerArray[1], wNFI);
 
             var typeString = headerArray[2].Substring(0, 3);
             PiaType = (PiaType)Enum.Parse(typeof(PiaType), typeString);
