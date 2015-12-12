@@ -18,9 +18,9 @@ namespace PiaNO.Plot
             get { return _getNextStyleNode(); }
         }
 
-        public IEnumerable<PlotStyle> PlotStyles
+        public ICollection<PlotStyle> PlotStyles
         {
-            get { return _getPlotStyles().ToList().AsReadOnly(); }
+            get { return _getPlotStyles().ToList(); }
         }
 
         public IDictionary<int, double> Lineweights

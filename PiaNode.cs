@@ -63,7 +63,7 @@ namespace PiaNO
 
         #region Methods
 
-        protected string GetValue(string key)
+        protected internal string GetValue(string key)
         {
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException("key");
@@ -73,7 +73,7 @@ namespace PiaNO
             
             return Values[key];
         }
-        protected void SetValue(string key, string value)
+        protected internal void SetValue(string key, string value)
         {
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException("key");
