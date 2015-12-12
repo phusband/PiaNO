@@ -1,16 +1,15 @@
 ﻿//
-//  Copyright © 2014 Parrish Husband (parrish.husband@gmail.com)
+//  Copyright © 2015 Parrish Husband (parrish.husband@gmail.com)
 //  The MIT License (MIT) - See LICENSE.txt for further details.
 //
 
+using ICSharpCode.SharpZipLib.Zip.Compression;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using PiaNO.Zip.Checksums;
-using PiaNO.Zip.Compression;
-using PiaNO.Zip.Streams;
 
 namespace PiaNO.Serialization
 {
@@ -35,6 +34,7 @@ namespace PiaNO.Serialization
                 // Inflation
                 string inflatedString;
                 stream.Seek(60, SeekOrigin.Begin);
+
                 using (var zStream = new InflaterInputStream(stream))
                 {
                     var sr = new StreamReader(zStream, Encoding.Default);

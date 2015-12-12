@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -40,28 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Zip\Checksums\Adler32.cs" />
-    <Compile Include="Zip\Checksums\Crc32.cs" />
-    <Compile Include="Zip\Checksums\IChecksum.cs" />
-    <Compile Include="Zip\Compression\Deflater.cs" />
-    <Compile Include="Zip\Compression\DeflaterEngine.cs" />
-    <Compile Include="Zip\Compression\DeflaterHuffman.cs" />
-    <Compile Include="Zip\Compression\DeflaterPending.cs" />
-    <Compile Include="Zip\Compression\DeflatorConstants.cs" />
-    <Compile Include="Zip\Compression\Inflater.cs" />
-    <Compile Include="Zip\Compression\InflaterDynHeader.cs" />
-    <Compile Include="Zip\Compression\InflaterHuffmanTree.cs" />
-    <Compile Include="Zip\Compression\PendingBuffer.cs" />
-    <Compile Include="Zip\Streams\DeflatorOutputStream.cs" />
-    <Compile Include="Zip\Streams\OutputWindow.cs" />
-    <Compile Include="Zip\Streams\StreamManipulator.cs" />
-    <Compile Include="Zip\ZipConstants.cs" />
-    <Compile Include="Zip\ZipEntry.cs" />
-    <Compile Include="Zip\ZipException.cs" />
-    <Compile Include="Zip\ZipExtraData.cs" />
-    <Compile Include="Zip\ZipHelperStream.cs" />
-    <Compile Include="Zip\Encryption\PkzipClassic.cs" />
-    <Compile Include="Zip\Encryption\ZipAESTransform.cs" />
     <Compile Include="PiaNode.cs" />
     <Compile Include="PiaException.cs" />
     <Compile Include="Plot\ColorDependentPlotStyleTable.cs" />
@@ -79,7 +61,9 @@
     <Compile Include="Plot\PlotterModelParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\PiaSerializer.cs" />
-    <Compile Include="Zip\Streams\InflaterInputStream.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
