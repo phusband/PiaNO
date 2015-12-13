@@ -117,14 +117,14 @@ namespace PiaNO.Plot
         }
         public T GetCustomValue<T>(string key)
         {
-            if (!HasChildNodes)
-                throw new InvalidOperationException(NodeName + " has no child nodes");
+            if (!HasChildren)
+                throw new InvalidOperationException(Name + " has no child nodes");
 
             var node = this["custom"];
             if (node == null)
-                throw new InvalidOperationException(NodeName + " has no custom node");
+                throw new InvalidOperationException(Name + " has no custom node");
 
-            foreach (var child in node)
+            foreach (var child in node.Children)
             {
                 string name;
                 string valueString;
@@ -167,14 +167,14 @@ namespace PiaNO.Plot
 
         public void SetCustomValue(string key, object value)
         {
-            if (!HasChildNodes)
-                throw new InvalidOperationException(NodeName + " has no child nodes");
+            if (!HasChildren)
+                throw new InvalidOperationException(Name + " has no child nodes");
 
             var node = this["custom"];
             if (node == null)
-                throw new InvalidOperationException(NodeName + " has no custom node");
+                throw new InvalidOperationException(Name + " has no custom node");
 
-            foreach (var child in node)
+            foreach (var child in node.Children)
             {
                 string name;
                 string valueString;
@@ -192,7 +192,7 @@ namespace PiaNO.Plot
 
         private string _getValue(string nodeName, string name)
         {
-            if (!HasChildNodes)
+            if (!HasChildren)
                 return null;
 
             var node = this[nodeName];
@@ -206,7 +206,7 @@ namespace PiaNO.Plot
         }
         private void _setValue(string nodeName, string name, string value)
         {
-            if (!HasChildNodes)
+            if (!HasChildren)
                 return;
 
             var node = this[nodeName];
@@ -217,15 +217,15 @@ namespace PiaNO.Plot
         }
         private IDictionary<string, object> _getCustomDictionary()
         {
-            if (!HasChildNodes)
+            if (!HasChildren)
                 return null;
 
             var node = this["custom"];
             if (node == null)
                 return null;
 
-            var customDictionary = new Dictionary<string, object>(node.ChildNodes.Count, StringComparer.OrdinalIgnoreCase);
-            foreach(var child in node)
+            var customDictionary = new Dictionary<string, object>(node.Children.Count(), StringComparer.OrdinalIgnoreCase);
+            foreach(var child in node.Children)
             {
                 string name;
                 string valueString;

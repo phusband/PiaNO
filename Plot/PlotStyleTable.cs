@@ -81,26 +81,26 @@ namespace PiaNO.Plot
             if (styleNode == null)
                 throw new NotImplementedException("Create style node if it doesn't exist!");
 
-            return !styleNode.HasChildNodes
+            return !styleNode.HasChildren
                     ? 0
-                    : styleNode.ChildNodes.Count;
+                    : styleNode.Children.Count();
         }
 
         protected virtual IEnumerable<PlotStyle> _getPlotStyles()
         {
-            if (!HasChildNodes)
+            if (!HasChildren)
                 return null;
 
             var styleNode = this["plot_style"];
-            if (styleNode == null || !styleNode.HasChildNodes)
+            if (styleNode == null || !styleNode.HasChildren)
                 return null;
 
-            var styles = styleNode.ChildNodes;
+            var styles = styleNode.Children;
             return styles.Select(s => new PlotStyle(s));
         }
         protected Dictionary<int, double> _getLineWeights()
         {
-            if (!HasChildNodes)
+            if (!HasChildren)
                 return null;
 
             var weightNode = this["custom_lineweight_table"];
@@ -117,14 +117,14 @@ namespace PiaNO.Plot
                 throw new ArgumentNullException("style");
 
             if (PlotStyles.Contains(style))
-                throw new ArgumentException(string.Format("Style '{0}' already exists.", style.Name));
+                throw new ArgumentException(string.Format("Style '{0}' already exists.", style.PlotStyleName));
 
             var styleNode = this["plot_style"];
             if (styleNode == null)
                 throw new NotImplementedException("Create style node if it doesn't exist!");
 
-            style.NodeName = _nextStyleNode.ToString();
-            styleNode.ChildNodes.Add(style);
+            style.PlotStyleName = _nextStyleNode.ToString();
+            //styleNode.Children.Add(style);
         }
 
         #endregion

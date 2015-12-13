@@ -13,15 +13,12 @@ using System.Text;
 
 namespace PiaNO.Serialization
 {
-    public static class PiaSerializer
+    public static class PiaNodeSerializer
     {
-        public static void Deserialize(Stream stream, PiaFile piaFile)
+        public static void DeserializeFile(Stream stream, PiaFile piaFile)
         {
             if (stream == null)
                 throw new ArgumentNullException("Stream");
-
-            if (piaFile == null)
-                throw new ArgumentNullException("PiaFile");
 
             try
             {
@@ -42,8 +39,8 @@ namespace PiaNO.Serialization
                 }
 
                 // Nodes
-                piaFile.Owner = piaFile;
-                _deserializeNode(piaFile, inflatedString);
+                //piaFile.Root = piaFile;
+                DeserializeNode(inflatedString, piaFile);
             }
             catch (Exception)
             {
@@ -51,17 +48,15 @@ namespace PiaNO.Serialization
             }
 
         }
-        internal static void _deserializeNode(PiaNode parent, string nodeString)
+        public static void DeserializeNode(string nodeString, PiaNode node)
         {
-            if (parent == null && !(parent is PiaFile))
-                throw new ArgumentNullException("parent");
-
             if (nodeString == null)
                 throw new ArgumentNullException("nodeString");
 
-            var dataLines = nodeString.Split(new char[] { '\r', '\n' },
-                                            StringSplitOptions.RemoveEmptyEntries);
+            if (node == null)
+                throw new ArgumentNullException("node");
 
+            var dataLines = nodeString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             for (int i = 0; i < dataLines.Length; i++)
             {
                 var curLine = dataLines[i];
@@ -69,10 +64,10 @@ namespace PiaNO.Serialization
                 {
                     var value = _deserializeValue(curLine);
 
-                    if (!parent.Values.ContainsKey(value.Key))
-                        parent.Values.Add(value.Key, value.Value);
+                    if (!node.Values.ContainsKey(value.Key))
+                        node.Values.Add(value.Key, value.Value);
                     else
-                        parent.Values[value.Key] = value.Value;
+                        node.Values[value.Key] = value.Value;
                 }
                 else if (curLine.Contains('{'))
                 {
@@ -92,14 +87,8 @@ namespace PiaNO.Serialization
                             nodeBuilder.AppendLine(subLine);
                     }
 
-                    var childNode = new PiaNode(nodeBuilder.ToString())
-                    {
-                        NodeName = curLine.Trim().TrimEnd('{'),
-                        Parent = parent,
-                        Owner = parent.Owner
-                    };
-
-                    parent.ChildNodes.Add(childNode);
+                    var childNode = new PiaNode(curLine.Trim().TrimEnd('{'), nodeBuilder.ToString(), node);
+                    //node.Children.Add(childNode);
 
                     i = n - 1;
                 }
@@ -175,9 +164,9 @@ namespace PiaNO.Serialization
             foreach (var value in node.Values)
                 nodeBuilder.AppendFormat("{0}{1}\n", whiteSpace, _serializeValue(value));
 
-            foreach (var child in node.ChildNodes)
+            foreach (var child in node.Children)
             {
-                nodeBuilder.AppendFormat("{0}{1}{2}\n", whiteSpace, child.NodeName, "{");
+                nodeBuilder.AppendFormat("{0}{1}{2}\n", whiteSpace, child.Name, "{");
                 nodeBuilder.Append(_serializeNode(child, level + 1));
                 nodeBuilder.AppendFormat("{0}{1}\n", whiteSpace, "}");
             }

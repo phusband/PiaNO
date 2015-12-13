@@ -34,7 +34,7 @@ namespace PiaNO.Plot
 
         private IDictionary<string, string> _getAciTable()
         {
-            if (!HasChildNodes)
+            if (!this.HasChildren)
                 return null;
 
             var aciNode = this["aci_table"];

@@ -1,5 +1,5 @@
 ﻿//
-//  Copyright © 2014 Parrish Husband (parrish.husband@gmail.com)
+//  Copyright © 2015 Parrish Husband (parrish.husband@gmail.com)
 //  The MIT License (MIT) - See LICENSE.txt for further details.
 //
 
@@ -8,55 +8,54 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using PiaNO.Serialization;
 
 namespace PiaNO
 {
-    public class PiaNode : ICloneable, IEquatable<PiaNode>, IEnumerable<PiaNode>
+    public class PiaNode : Node<PiaNode>, IEquatable<PiaNode>
     {
         #region Properties
 
-        private IList<PiaNode> _childNodes;
+        private readonly PiaData _data;
+        private string _innerData;
+        private Dictionary<string, string> _values;
 
-        protected internal IList<PiaNode> ChildNodes
+        public PiaData Data
         {
-            get { return _childNodes ?? (_childNodes = new List<PiaNode>()); }
-            set { _childNodes = value; }
+            get { return _data; }
         }
-        protected internal bool HasChildNodes
+        public string InnerData
         {
-            get { return ChildNodes != null && ChildNodes.Count > 0; }
+            get { return _innerData; }
+            set { _innerData = value; }
         }
-        protected internal string InnerData
-        {
-            get { return PiaSerializer._serializeNode(this); }
-        }
-        protected internal string NodeName { get; set; }
-        protected internal PiaFile Owner { get; set; }
-        protected internal PiaNode Parent { get; set; }
-
-        protected internal Dictionary<string, string> Values
+        public string Name{ get; set; }
+        public Dictionary<string, string> Values
         {
             get { return _values ?? (_values = new Dictionary<string, string>()); }
             set { _values = value; }
         }
-        private Dictionary<string, string> _values;
-
+        
         #endregion
 
         #region Constructors
 
-        protected internal PiaNode()
+        protected PiaNode()
         {
-            ChildNodes = new List<PiaNode>();
-            Values = new Dictionary<string, string>();
         }
-        protected internal PiaNode(string innerData)
-        {
-            ChildNodes = new List<PiaNode>();
-            Values = new Dictionary<string, string>();
+        
+        internal PiaNode(string name, string innerData)
+            : this(name, innerData, null) { }
 
-            PiaSerializer._deserializeNode(this, innerData);
+        internal PiaNode(string name, string innerData, PiaNode parent)
+        {
+            //this._data = data;
+            this.Name = name;
+
+            if (parent != null)
+            {
+                this.Parent = parent;
+                this.Root = parent.Root;
+            }
         }
 
         #endregion
@@ -96,28 +95,19 @@ namespace PiaNO
         {
             get
             {
-                if (ChildNodes.Count == 0)
+                if (!HasChildren)
                     return null;
                     //throw new ArgumentOutOfRangeException();
 
-                return ChildNodes.FirstOrDefault(n => n.NodeName.Equals(name, 
-                       StringComparison.InvariantCultureIgnoreCase));
+                return Children.FirstOrDefault(n => n.Name.Equals(name, 
+                       StringComparison.OrdinalIgnoreCase));
 
             }
         }
 
         public override string ToString()
         {
-            return this.NodeName;
-        }
-
-        #endregion
-
-        #region ICloneable
-
-        public object Clone()
-        {
-            return this.MemberwiseClone();
+            return this.Name;
         }
 
         #endregion
@@ -132,23 +122,19 @@ namespace PiaNO
             if (this == null || other == null)
                 return false;
 
-            return this.NodeName.Equals(other.NodeName, StringComparison.InvariantCultureIgnoreCase);
+            return this.Name.Equals(other.Name, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion
 
-        #region IEnumerable
-
-        public IEnumerator<PiaNode> GetEnumerator()
+        protected override IEnumerable<PiaNode> GetChildren()
         {
-            return ChildNodes.GetEnumerator();
+            throw new NotImplementedException();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        protected override PiaNode GetParent()
         {
-            return GetEnumerator();
+            throw new NotImplementedException();
         }
-
-        #endregion
     }
 }

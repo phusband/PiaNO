@@ -50,7 +50,7 @@ namespace PiaNO
                 FileName = Path.GetFileName(fileName);
                 using (var inStream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
                 {
-                    PiaSerializer.Deserialize(inStream, this);
+                    PiaNodeSerializer.DeserializeFile(inStream, this);
                     inStream.Close();
                 }
             }
@@ -74,7 +74,7 @@ namespace PiaNO
             {
                 using (var outStream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
                 {
-                    PiaSerializer.Serialize(outStream, this);
+                    PiaNodeSerializer.Serialize(outStream, this);
                     outStream.Close();
                 }
             }

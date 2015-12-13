@@ -44,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\INode.cs" />
+    <Compile Include="Node.cs" />
+    <Compile Include="PiaData.cs" />
     <Compile Include="PiaNode.cs" />
     <Compile Include="PiaException.cs" />
     <Compile Include="Plot\ColorDependentPlotStyleTable.cs" />

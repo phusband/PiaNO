@@ -14,7 +14,7 @@ namespace PiaNO.Plot
 
         private const string USE_OBJECT_COLOR = "-1006632961";
 
-        public string Name
+        public string PlotStyleName
         {
             get { return GetValue("name_str"); }
             set { SetValue("name_str", value); }
@@ -119,7 +119,7 @@ namespace PiaNO.Plot
         public PlotStyle()
             : base()
         {
-            Name = "New style"; // needs to be iterative based on existing nodes
+            PlotStyleName = "New style"; // needs to be iterative based on existing nodes
             LocalizedName = string.Empty;
             Description = string.Empty;
             Color = null;
@@ -136,14 +136,14 @@ namespace PiaNO.Plot
             EndStyle = EndStyle.FromObject;
             JoinStyle = JoinStyle.FromObject;
         }
-        protected internal PlotStyle(string innerData)
-            : base(innerData) { }
+        //public  PlotStyle(string name, string innerData)
+        //    : base(name, innerData) { }
 
         internal PlotStyle(PiaNode baseNode)
         {
-            NodeName = baseNode.NodeName;
+            PlotStyleName = baseNode.Name;
             Parent = baseNode.Parent;
-            Owner = baseNode.Owner;
+            Root = baseNode.Root;
             Values = baseNode.Values;
         }
 
@@ -153,7 +153,7 @@ namespace PiaNO.Plot
 
         public override string ToString()
         {
-            return Name;
+            return PlotStyleName;
         }
 
         #endregion
